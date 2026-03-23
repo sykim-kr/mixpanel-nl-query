@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { MixpanelAuthRequest, MixpanelAuthResponse, MixpanelProject } from '../types';
+import { API_BASE } from '../config';
 
 const STORAGE_KEY = 'mixpanel-auth';
 
@@ -42,7 +43,7 @@ export function useMixpanelAuth() {
     setAuthError(null);
 
     try {
-      const apiBase = (import.meta.env && import.meta.env.VITE_API_URL) || '';
+      const apiBase = API_BASE;
       const response = await fetch(`${apiBase}/api/mixpanel/auth`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
