@@ -2,3 +2,5 @@ node_modules/
 dist/
 .env
 *.log
+Mixpanel_config.txt
+.claude/
