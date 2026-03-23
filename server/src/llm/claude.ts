@@ -37,11 +37,11 @@ export class ClaudeProvider implements LLMProvider {
       input_schema: t.input_schema as Anthropic.Tool['input_schema'],
     }));
 
-    const model = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-20250514';
+    const model = process.env.ANTHROPIC_MODEL || 'claude-haiku-4-5-20251001';
 
     const response = await this.client.messages.create({
       model,
-      max_tokens: 4096,
+      max_tokens: 1024,
       system: SYSTEM_PROMPT,
       tools: anthropicTools,
       messages,

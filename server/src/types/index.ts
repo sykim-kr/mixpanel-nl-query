@@ -1,6 +1,23 @@
 export interface QueryRequest {
   question: string;
   provider?: 'anthropic' | 'openai';
+  projectId: string;
+  sessionToken: string;
+}
+
+export interface MixpanelProject {
+  id: string;
+  name: string;
+}
+
+export interface MixpanelAuthRequest {
+  username: string;
+  secret: string;
+}
+
+export interface MixpanelAuthResponse {
+  sessionToken: string;
+  projects: MixpanelProject[];
 }
 
 export interface QueryMetadata {

@@ -4,14 +4,21 @@ import type { KeyboardEvent } from 'react';
 interface QueryInputProps {
   onSubmit: (question: string) => void;
   isLoading: boolean;
+  disabled?: boolean;
+  placeholder?: string;
 }
 
-export default function QueryInput({ onSubmit, isLoading }: QueryInputProps) {
+export default function QueryInput({
+  onSubmit,
+  isLoading,
+  disabled = false,
+  placeholder = 'Mixpanel 데이터에 대해 질문하세요...',
+}: QueryInputProps) {
   const [question, setQuestion] = useState('');
 
   const handleSubmit = () => {
     const trimmed = question.trim();
-    if (trimmed && !isLoading) {
+    if (trimmed && !isLoading && !disabled) {
       onSubmit(trimmed);
       setQuestion('');
     }
@@ -23,6 +30,8 @@ export default function QueryInput({ onSubmit, isLoading }: QueryInputProps) {
       handleSubmit();
     }
   };
+
+  const isDisabled = isLoading || disabled;
 
   return (
     <div style={{
@@ -36,8 +45,8 @@ export default function QueryInput({ onSubmit, isLoading }: QueryInputProps) {
         value={question}
         onChange={e => setQuestion(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="Mixpanel 데이터에 대해 질문하세요..."
-        disabled={isLoading}
+        placeholder={placeholder}
+        disabled={isDisabled}
         rows={2}
         style={{
           flex: 1,
@@ -52,10 +61,10 @@ export default function QueryInput({ onSubmit, isLoading }: QueryInputProps) {
       />
       <button
         onClick={handleSubmit}
-        disabled={isLoading || !question.trim()}
+        disabled={isDisabled || !question.trim()}
         style={{
           padding: 'var(--space-sm) var(--space-lg)',
-          background: question.trim() && !isLoading ? 'var(--text-primary)' : 'var(--border)',
+          background: question.trim() && !isDisabled ? 'var(--text-primary)' : 'var(--border)',
           color: 'var(--white)',
           border: 'none',
           fontSize: '14px',

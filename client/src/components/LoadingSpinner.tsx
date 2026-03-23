@@ -1,4 +1,4 @@
-export default function LoadingSpinner() {
+export default function LoadingSpinner({ message }: { message?: string | null }) {
   return (
     <div style={{
       padding: 'var(--space-2xl)',
@@ -16,7 +16,7 @@ export default function LoadingSpinner() {
         animation: 'spin 0.8s linear infinite',
       }} />
       <span style={{ fontSize: '13px', color: 'var(--text-secondary)', letterSpacing: '0.05em' }}>
-        Mixpanel 데이터 분석 중...
+        {message || 'Mixpanel 데이터 분석 중...'}
       </span>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>

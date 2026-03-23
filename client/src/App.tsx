@@ -7,18 +7,35 @@ import ChartPanel from './components/ChartPanel';
 import HistoryList from './components/HistoryList';
 import ErrorMessage from './components/ErrorMessage';
 import LoadingSpinner from './components/LoadingSpinner';
+import ProjectSelector from './components/ProjectSelector';
+import MixpanelAuthModal from './components/MixpanelAuthModal';
 import { useQuery } from './hooks/useQuery';
 import { useHistory } from './hooks/useHistory';
+import { useMixpanelAuth } from './hooks/useMixpanelAuth';
 
 type Provider = 'anthropic' | 'openai';
 
 export default function App() {
   const [provider, setProvider] = useState<Provider>('anthropic');
-  const { isLoading, error, submitQuery } = useQuery();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const { isLoading, error, statusMessage, submitQuery } = useQuery();
   const { entries, selectedId, selectedEntry, setSelectedId, addEntry } = useHistory();
+  const {
+    sessionToken,
+    projects,
+    selectedProjectId,
+    isAuthenticated,
+    isAuthenticating,
+    authError,
+    connect,
+    logout,
+    selectProject,
+  } = useMixpanelAuth();
 
   const handleSubmit = async (question: string) => {
-    const result = await submitQuery(question, provider);
+    if (!sessionToken || !selectedProjectId) return;
+    const result = await submitQuery(question, provider, selectedProjectId, sessionToken);
     if (result) {
       addEntry(question, result);
     }
@@ -37,23 +54,63 @@ export default function App() {
         borderBottom: '1px solid var(--border)',
         background: 'var(--white)',
       }}>
-        <h1 style={{ fontSize: '18px', fontWeight: 700 }}>
+        <h1 style={{ fontSize: '18px', fontWeight: 700, margin: 0 }}>
           Mixpanel <span style={{ color: 'var(--accent)' }}>Query</span>
         </h1>
-        <select
-          value={provider}
-          onChange={e => setProvider(e.target.value as Provider)}
-          style={{
-            padding: 'var(--space-xs) var(--space-md)',
-            border: '1px solid var(--border)',
-            background: 'var(--white)',
-            fontSize: '13px',
-            fontWeight: 600,
-          }}
-        >
-          <option value="anthropic">Claude</option>
-          <option value="openai">GPT</option>
-        </select>
+
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <select
+            value={provider}
+            onChange={e => setProvider(e.target.value as Provider)}
+            style={{
+              padding: 'var(--space-xs) var(--space-md)',
+              border: '1px solid var(--border)',
+              background: 'var(--white)',
+              fontSize: '13px',
+              fontWeight: 600,
+            }}
+          >
+            <option value="anthropic">Claude</option>
+            <option value="openai">GPT</option>
+          </select>
+
+          <ProjectSelector
+            projects={projects}
+            selectedProjectId={selectedProjectId}
+            onChange={selectProject}
+            disabled={!isAuthenticated}
+          />
+
+          <button
+            onClick={() => setIsAuthModalOpen(true)}
+            style={{
+              padding: 'var(--space-xs) var(--space-md)',
+              border: '1px solid var(--border)',
+              background: isAuthenticated ? 'var(--white)' : 'var(--text-primary)',
+              color: isAuthenticated ? 'var(--text-primary)' : 'var(--white)',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            {isAuthenticated ? 'Reconnect' : 'Connect Mixpanel'}
+          </button>
+
+          {isAuthenticated && (
+            <button
+              onClick={logout}
+              style={{
+                padding: 'var(--space-xs) var(--space-md)',
+                border: '1px solid var(--border)',
+                background: 'var(--white)',
+                fontSize: '13px',
+                cursor: 'pointer',
+              }}
+            >
+              Disconnect
+            </button>
+          )}
+        </div>
       </header>
 
       {/* Body */}
@@ -67,10 +124,21 @@ export default function App() {
 
         {/* Main */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <QueryInput onSubmit={handleSubmit} isLoading={isLoading} />
+          <QueryInput
+            onSubmit={handleSubmit}
+            isLoading={isLoading}
+            disabled={!isAuthenticated || !selectedProjectId}
+            placeholder={
+              !isAuthenticated
+                ? '먼저 Mixpanel 연결을 완료하세요'
+                : !selectedProjectId
+                ? '프로젝트를 선택하세요'
+                : 'Mixpanel 데이터에 대해 질문하세요...'
+            }
+          />
 
           <div style={{ flex: 1, overflow: 'auto', padding: 'var(--space-md)' }}>
-            {isLoading && <LoadingSpinner />}
+            {isLoading && <LoadingSpinner message={statusMessage} />}
             {error && <ErrorMessage message={error} />}
             {displayResult && (
               <>
@@ -89,12 +157,22 @@ export default function App() {
                 color: 'var(--text-secondary)',
                 fontSize: '14px',
               }}>
-                Mixpanel 데이터에 대해 자연어로 질문하세요
+                {!isAuthenticated
+                  ? 'Connect Mixpanel 버튼을 클릭하여 시작하세요'
+                  : 'Mixpanel 데이터에 대해 자연어로 질문하세요'}
               </div>
             )}
           </div>
         </div>
       </div>
+
+      <MixpanelAuthModal
+        open={isAuthModalOpen}
+        isLoading={isAuthenticating}
+        error={authError}
+        onClose={() => setIsAuthModalOpen(false)}
+        onConnect={connect}
+      />
     </div>
   );
 }

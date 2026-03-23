@@ -4,3 +4,5 @@ dist/
 *.log
 Mixpanel_config.txt
 .claude/
+client/.vite/
+chatgpt_conversation.txt
