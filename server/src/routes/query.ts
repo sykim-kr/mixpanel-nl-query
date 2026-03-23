@@ -5,6 +5,7 @@ import { mixpanelTools } from '../mixpanel/tools';
 import { MixpanelClient } from '../mixpanel/client';
 import { parseToTable, parseToChart } from '../mixpanel/parser';
 import { getMixpanelSession } from '../lib/sessionStore';
+import { getSystemPrompt } from '../llm/prompt';
 
 const router = Router();
 const MAX_ITERATIONS = 10;
@@ -82,7 +83,7 @@ async function executeToolsParallel(
 }
 
 router.post('/query', async (req: Request, res: Response) => {
-  const { question, provider: providerName, projectId, sessionToken } = req.body as QueryRequest;
+  const { question, provider: providerName, projectId, sessionToken, activeEvent } = req.body as QueryRequest;
 
   if (!question || question.trim().length === 0) {
     return res.status(400).json({ error: true, code: 'LLM_ERROR', message: '질문을 입력해 주세요.' } as QueryErrorResponse);
@@ -114,7 +115,8 @@ router.post('/query', async (req: Request, res: Response) => {
         return res.status(504).json({ error: true, code: 'TIMEOUT', message: '질의 처리 시간이 초과되었습니다.' } as QueryErrorResponse);
       }
 
-      const { stepResult, messages: updatedMessages } = await llmProvider.chat(question, mixpanelTools, toolResults, messages);
+      const systemPrompt = getSystemPrompt(activeEvent);
+      const { stepResult, messages: updatedMessages } = await llmProvider.chat(question, mixpanelTools, toolResults, messages, systemPrompt);
       messages = updatedMessages;
       iteration++;
 
@@ -152,7 +154,7 @@ router.post('/query', async (req: Request, res: Response) => {
 
 // SSE 스트리밍 엔드포인트
 router.post('/query/stream', async (req: Request, res: Response) => {
-  const { question, provider: providerName, projectId, sessionToken } = req.body as QueryRequest;
+  const { question, provider: providerName, projectId, sessionToken, activeEvent } = req.body as QueryRequest;
 
   if (!question || question.trim().length === 0) {
     return res.status(400).json({ error: true, code: 'LLM_ERROR', message: '질문을 입력해 주세요.' });
@@ -197,7 +199,8 @@ router.post('/query/stream', async (req: Request, res: Response) => {
 
       send('status', { step: 'llm', iteration: iteration + 1, message: 'AI가 분석 중...' });
 
-      const { stepResult, messages: updatedMessages } = await llmProvider.chat(question, mixpanelTools, toolResults, messages);
+      const systemPrompt = getSystemPrompt(activeEvent);
+      const { stepResult, messages: updatedMessages } = await llmProvider.chat(question, mixpanelTools, toolResults, messages, systemPrompt);
       messages = updatedMessages;
       iteration++;
 

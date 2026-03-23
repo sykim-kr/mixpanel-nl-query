@@ -6,6 +6,9 @@ interface QueryInputProps {
   isLoading: boolean;
   disabled?: boolean;
   placeholder?: string;
+  availableEvents?: string[];
+  activeEvent?: string;
+  onActiveEventChange?: (event: string) => void;
 }
 
 const EXAMPLE_QUERIES = [
@@ -21,6 +24,9 @@ export default function QueryInput({
   isLoading,
   disabled = false,
   placeholder = 'Mixpanel 데이터에 대해 질문하세요...',
+  availableEvents = [],
+  activeEvent = '',
+  onActiveEventChange,
 }: QueryInputProps) {
   const [question, setQuestion] = useState('');
 
@@ -123,6 +129,47 @@ export default function QueryInput({
               {q}
             </button>
           ))}
+        </div>
+      )}
+
+      {/* Active Event 선택 */}
+      {!isDisabled && availableEvents.length > 0 && onActiveEventChange && (
+        <div style={{
+          marginTop: 12,
+          padding: '10px 14px',
+          background: '#faf8ff',
+          border: '1px solid #e8e0ff',
+          borderRadius: 6,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            <div style={{ flex: '1 1 auto', minWidth: 200 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#5a4a8a', marginBottom: 2 }}>
+                Active 이벤트 정의
+              </div>
+              <div style={{ fontSize: 11, color: '#888', lineHeight: 1.4 }}>
+                DAU/MAU 산출 시 해당 이벤트를 수행한 사용자를 Active로 간주합니다.
+              </div>
+            </div>
+            <select
+              value={activeEvent}
+              onChange={(e) => onActiveEventChange(e.target.value)}
+              style={{
+                padding: '6px 10px',
+                border: '2px solid #d4ccf0',
+                borderRadius: 6,
+                background: '#fff',
+                fontSize: 12,
+                minWidth: 200,
+                outline: 'none',
+                color: activeEvent ? '#333' : '#999',
+              }}
+            >
+              <option value="">-- 이벤트를 선택하세요 --</option>
+              {availableEvents.map((ev) => (
+                <option key={ev} value={ev}>{ev}</option>
+              ))}
+            </select>
+          </div>
         </div>
       )}
     </div>

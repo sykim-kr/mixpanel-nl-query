@@ -8,8 +8,11 @@ function getDaysAgo(days: number): string {
   return d.toISOString().slice(0, 10);
 }
 
-export function getSystemPrompt(): string {
+export function getSystemPrompt(activeEvent?: string): string {
   const today = getToday();
+  const activeEventBlock = activeEvent
+    ? `\n## DAU/MAU 산출 기준\n- Active 이벤트: "${activeEvent}"\n- DAU: 해당 이벤트를 하루에 1회 이상 수행한 고유 사용자 수\n- WAU: 해당 이벤트를 7일간 1회 이상 수행한 고유 사용자 수\n- MAU: 해당 이벤트를 30일간 1회 이상 수행한 고유 사용자 수\n- DAU/MAU 질문 시 반드시 이 이벤트를 기준으로 JQL 또는 query_insights를 사용하세요.\n`
+    : '';
   return `당신은 Mixpanel 데이터 분석가입니다. 사용자의 질문에 최소한의 도구 호출로 빠르게 답변하세요.
 
 오늘 날짜: ${today}
@@ -35,7 +38,7 @@ export function getSystemPrompt(): string {
 도구 결과를 받으면 반드시 아래 JSON으로 답변:
 {"answer":"한국어 답변","metadata":{"toolCalls":["도구 요약"],"dateRange":"기간","dimensions":["차원"],"metrics":["지표"]}}
 
-답변은 간결하게. 숫자는 천 단위 콤마로 포맷.`;
+답변은 간결하게. 숫자는 천 단위 콤마로 포맷.${activeEventBlock}`;
 }
 
 // 하위 호환용

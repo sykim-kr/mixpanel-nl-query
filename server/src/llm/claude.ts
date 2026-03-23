@@ -15,7 +15,8 @@ export class ClaudeProvider implements LLMProvider {
     question: string,
     tools: ToolDefinition[],
     toolResults: ToolResult[],
-    previousMessages: unknown[]
+    previousMessages: unknown[],
+    systemPrompt?: string
   ): Promise<{ stepResult: LLMStepResult; messages: unknown[] }> {
     const messages: Anthropic.MessageParam[] = previousMessages.length > 0
       ? (previousMessages as Anthropic.MessageParam[])
@@ -42,7 +43,7 @@ export class ClaudeProvider implements LLMProvider {
     const response = await this.client.messages.create({
       model,
       max_tokens: 1024,
-      system: SYSTEM_PROMPT,
+      system: systemPrompt || SYSTEM_PROMPT,
       tools: anthropicTools,
       messages,
     });

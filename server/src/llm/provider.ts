@@ -10,7 +10,8 @@ export interface LLMProvider {
     question: string,
     tools: ToolDefinition[],
     toolResults: ToolResult[],
-    previousMessages: unknown[]
+    previousMessages: unknown[],
+    systemPrompt?: string
   ): Promise<{ stepResult: LLMStepResult; messages: unknown[] }>;
 }
 

@@ -11,7 +11,8 @@ interface UseQueryReturn {
     question: string,
     provider: 'anthropic' | 'openai',
     projectId: string,
-    sessionToken: string
+    sessionToken: string,
+    activeEvent?: string
   ) => Promise<QueryResponse | null>;
 }
 
@@ -25,14 +26,15 @@ export function useQuery(): UseQueryReturn {
     question: string,
     provider: 'anthropic' | 'openai',
     projectId: string,
-    sessionToken: string
+    sessionToken: string,
+    activeEvent?: string
   ): Promise<QueryResponse | null> => {
     setIsLoading(true);
     setError(null);
     setResult(null);
     setStatusMessage('요청 전송 중...');
 
-    const body = JSON.stringify({ question, provider, projectId, sessionToken });
+    const body = JSON.stringify({ question, provider, projectId, sessionToken, activeEvent: activeEvent || undefined });
 
     try {
       const apiBase = API_BASE;

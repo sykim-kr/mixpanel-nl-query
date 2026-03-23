@@ -16,6 +16,7 @@ export function useMixpanelAuth() {
   const [selectedProjectId, setSelectedProjectId] = useState('');
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [availableEvents, setAvailableEvents] = useState<string[]>([]);
 
   useEffect(() => {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -38,13 +39,26 @@ export function useMixpanelAuth() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   }, []);
 
+  const fetchEvents = useCallback(async (token: string, projectId: string) => {
+    try {
+      const response = await fetch(
+        `${API_BASE}/api/mixpanel/events?sessionToken=${encodeURIComponent(token)}&projectId=${encodeURIComponent(projectId)}`
+      );
+      if (!response.ok) return;
+      const data = await response.json();
+      const events = Array.isArray(data.events) ? data.events : [];
+      setAvailableEvents(events);
+    } catch {
+      setAvailableEvents([]);
+    }
+  }, []);
+
   const connect = useCallback(async (payload: MixpanelAuthRequest) => {
     setIsAuthenticating(true);
     setAuthError(null);
 
     try {
-      const apiBase = API_BASE;
-      const response = await fetch(`${apiBase}/api/mixpanel/auth`, {
+      const response = await fetch(`${API_BASE}/api/mixpanel/auth`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -69,6 +83,10 @@ export function useMixpanelAuth() {
         selectedProjectId: firstProjectId,
       });
 
+      if (firstProjectId) {
+        fetchEvents(authData.sessionToken, firstProjectId);
+      }
+
       return authData;
     } catch (err: any) {
       setAuthError(err.message || 'Mixpanel 인증에 실패했습니다.');
@@ -76,19 +94,22 @@ export function useMixpanelAuth() {
     } finally {
       setIsAuthenticating(false);
     }
-  }, [persist]);
+  }, [persist, fetchEvents]);
 
   const selectProject = useCallback((projectId: string) => {
     setSelectedProjectId(projectId);
+    setAvailableEvents([]);
     if (!sessionToken) return;
     persist({ sessionToken, projects, selectedProjectId: projectId });
-  }, [persist, projects, sessionToken]);
+    if (projectId) {
+      fetchEvents(sessionToken, projectId);
+    }
+  }, [persist, projects, sessionToken, fetchEvents]);
 
   const logout = useCallback(async () => {
-    const apiBase = (import.meta.env && import.meta.env.VITE_API_URL) || '';
     try {
       if (sessionToken) {
-        await fetch(`${apiBase}/api/mixpanel/logout`, {
+        await fetch(`${API_BASE}/api/mixpanel/logout`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ sessionToken }),
@@ -100,6 +121,7 @@ export function useMixpanelAuth() {
     setProjects([]);
     setSelectedProjectId('');
     setAuthError(null);
+    setAvailableEvents([]);
     persist(null);
   }, [persist, sessionToken]);
 
@@ -112,6 +134,7 @@ export function useMixpanelAuth() {
     isAuthenticated,
     isAuthenticating,
     authError,
+    availableEvents,
     connect,
     logout,
     selectProject,

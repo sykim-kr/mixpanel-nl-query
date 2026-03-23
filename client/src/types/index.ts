@@ -3,6 +3,7 @@ export interface QueryRequest {
   provider?: 'anthropic' | 'openai';
   projectId: string;
   sessionToken: string;
+  activeEvent?: string;
 }
 
 export interface MixpanelProject {

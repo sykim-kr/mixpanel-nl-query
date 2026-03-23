@@ -15,12 +15,13 @@ export class OpenAIProvider implements LLMProvider {
     question: string,
     tools: ToolDefinition[],
     toolResults: ToolResult[],
-    previousMessages: unknown[]
+    previousMessages: unknown[],
+    systemPrompt?: string
   ): Promise<{ stepResult: LLMStepResult; messages: unknown[] }> {
     const messages: OpenAI.ChatCompletionMessageParam[] = previousMessages.length > 0
       ? (previousMessages as OpenAI.ChatCompletionMessageParam[])
       : [
-          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'system', content: systemPrompt || SYSTEM_PROMPT },
           { role: 'user', content: question },
         ];
 

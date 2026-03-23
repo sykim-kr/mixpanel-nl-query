@@ -18,6 +18,7 @@ type Provider = 'anthropic' | 'openai';
 export default function App() {
   const [provider, setProvider] = useState<Provider>('anthropic');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [activeEvent, setActiveEvent] = useState('');
 
   const { isLoading, error, statusMessage, submitQuery } = useQuery();
   const { entries, selectedId, selectedEntry, setSelectedId, addEntry } = useHistory();
@@ -31,11 +32,12 @@ export default function App() {
     connect,
     logout,
     selectProject,
+    availableEvents,
   } = useMixpanelAuth();
 
   const handleSubmit = async (question: string) => {
     if (!sessionToken || !selectedProjectId) return;
-    const result = await submitQuery(question, provider, selectedProjectId, sessionToken);
+    const result = await submitQuery(question, provider, selectedProjectId, sessionToken, activeEvent || undefined);
     if (result) {
       addEntry(question, result);
     }
@@ -138,6 +140,9 @@ export default function App() {
             onSubmit={handleSubmit}
             isLoading={isLoading}
             disabled={!isAuthenticated || !selectedProjectId}
+            availableEvents={availableEvents}
+            activeEvent={activeEvent}
+            onActiveEventChange={setActiveEvent}
             placeholder={
               !isAuthenticated
                 ? '먼저 Mixpanel 연결을 완료하세요'

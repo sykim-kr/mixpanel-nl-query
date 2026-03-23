@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { MixpanelClient } from '../mixpanel/client';
-import { createMixpanelSession, deleteMixpanelSession } from '../lib/sessionStore';
+import { createMixpanelSession, deleteMixpanelSession, getMixpanelSession } from '../lib/sessionStore';
 import type { MixpanelAuthRequest, MixpanelAuthResponse, QueryErrorResponse } from '../types';
 
 const router = Router();
@@ -58,6 +58,32 @@ router.post('/mixpanel/logout', (req: Request, res: Response) => {
     deleteMixpanelSession(sessionToken);
   }
   return res.json({ ok: true });
+});
+
+router.get('/mixpanel/events', async (req: Request, res: Response) => {
+  const sessionToken = req.query.sessionToken as string;
+  const projectId = req.query.projectId as string;
+
+  if (!sessionToken || !projectId) {
+    return res.status(400).json({ error: true, code: 'MIXPANEL_ERROR', message: 'sessionToken과 projectId가 필요합니다.' });
+  }
+
+  const session = getMixpanelSession(sessionToken);
+  if (!session) {
+    return res.status(401).json({ error: true, code: 'MIXPANEL_ERROR', message: '세션이 만료되었습니다.' });
+  }
+
+  try {
+    const client = new MixpanelClient({
+      projectId,
+      username: session.username,
+      secret: session.secret,
+    });
+    const events = await client.getEvents();
+    return res.json({ events });
+  } catch (error: any) {
+    return res.status(500).json({ error: true, code: 'MIXPANEL_ERROR', message: error.message });
+  }
 });
 
 export default router;
