@@ -151,15 +151,37 @@ export default function App() {
             {!isLoading && !error && !displayResult && (
               <div style={{
                 display: 'flex',
+                flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center',
                 height: '100%',
+                gap: 24,
                 color: 'var(--text-secondary)',
                 fontSize: '14px',
               }}>
-                {!isAuthenticated
-                  ? 'Connect Mixpanel 버튼을 클릭하여 시작하세요'
-                  : 'Mixpanel 데이터에 대해 자연어로 질문하세요'}
+                {!isAuthenticated ? (
+                  <>
+                    <div style={{ marginTop: 60 }}>Mixpanel 서비스 계정으로 연결하세요</div>
+                    <button
+                      onClick={() => setIsAuthModalOpen(true)}
+                      style={{
+                        padding: '14px 36px',
+                        background: '#7856FF',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: 6,
+                        fontSize: '16px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        letterSpacing: '0.02em',
+                      }}
+                    >
+                      Connect Mixpanel
+                    </button>
+                  </>
+                ) : (
+                  'Mixpanel 데이터에 대해 자연어로 질문하세요'
+                )}
               </div>
             )}
           </div>
