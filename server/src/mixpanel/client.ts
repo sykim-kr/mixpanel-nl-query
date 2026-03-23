@@ -28,20 +28,29 @@ export class MixpanelClient {
     where?: string;
     group_by?: string[];
   }): Promise<unknown> {
-    const url = new URL(`${this.baseUrl}/2.0/insights`);
+    const url = new URL(`${this.baseUrl}/2.0/segmentation`);
     url.searchParams.set('project_id', this.config.projectId);
+    url.searchParams.set('from_date', params.from_date);
+    url.searchParams.set('to_date', params.to_date);
+    if (params.event) {
+      url.searchParams.set('event', params.event);
+    }
+    if (params.where) {
+      url.searchParams.set('where', params.where);
+    }
+    if (params.group_by && params.group_by.length > 0) {
+      url.searchParams.set('on', `properties["${params.group_by[0]}"]`);
+    }
 
     const response = await fetch(url.toString(), {
-      method: 'POST',
       headers: {
         'Authorization': this.getAuthHeader(),
-        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(params),
     });
 
     if (!response.ok) {
-      throw new Error(`Mixpanel API error: ${response.status} ${response.statusText}`);
+      const text = await response.text();
+      throw new Error(`Mixpanel API error: ${response.status} - ${text}`);
     }
     return response.json();
   }
@@ -90,7 +99,8 @@ export class MixpanelClient {
       body: `project_id=${this.config.projectId}&script=${encodeURIComponent(script)}`,
     });
     if (!response.ok) {
-      throw new Error(`Mixpanel JQL error: ${response.status}`);
+      const text = await response.text();
+      throw new Error(`Mixpanel JQL error: ${response.status} - ${text}`);
     }
     return response.json();
   }

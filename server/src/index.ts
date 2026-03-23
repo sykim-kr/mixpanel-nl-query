@@ -6,7 +6,7 @@ import queryRouter from './routes/query';
 
 // 로컬에서만 .env 로드, 프로덕션에선 플랫폼이 환경 변수 주입
 if (process.env.NODE_ENV !== 'production') {
-  dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+  dotenv.config({ path: path.resolve(__dirname, '../../.env'), override: true });
 }
 
 const app = express();

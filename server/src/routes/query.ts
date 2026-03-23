@@ -6,7 +6,7 @@ import { MixpanelClient } from '../mixpanel/client';
 import { parseToTable, parseToChart } from '../mixpanel/parser';
 
 const router = Router();
-const MAX_ITERATIONS = 5;
+const MAX_ITERATIONS = 10;
 const TIMEOUT_MS = 60_000;
 
 function createMixpanelClient(): MixpanelClient {
