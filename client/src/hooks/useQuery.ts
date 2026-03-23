@@ -34,7 +34,7 @@ export function useQuery(): UseQueryReturn {
     const body = JSON.stringify({ question, provider, projectId, sessionToken });
 
     try {
-      const apiBase = import.meta.env?.VITE_API_URL || '';
+      const apiBase = (import.meta.env && import.meta.env.VITE_API_URL) || '';
       const response = await fetch(`${apiBase}/api/query/stream`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
