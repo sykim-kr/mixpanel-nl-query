@@ -84,14 +84,18 @@ export default function App() {
           <button
             onClick={() => setIsAuthModalOpen(true)}
             style={{
-              padding: 'var(--space-xs) var(--space-md)',
-              border: '1px solid var(--border)',
-              background: isAuthenticated ? 'var(--white)' : 'var(--text-primary)',
-              color: isAuthenticated ? 'var(--text-primary)' : 'var(--white)',
+              padding: '8px 16px',
+              border: 'none',
+              borderRadius: 6,
+              background: isAuthenticated ? '#7856FF' : '#7856FF',
+              color: '#fff',
               fontSize: '13px',
               fontWeight: 600,
               cursor: 'pointer',
+              transition: 'opacity 0.2s',
             }}
+            onMouseEnter={e => { e.currentTarget.style.opacity = '0.85'; }}
+            onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}
           >
             {isAuthenticated ? 'Reconnect' : 'Connect Mixpanel'}
           </button>
@@ -100,12 +104,18 @@ export default function App() {
             <button
               onClick={logout}
               style={{
-                padding: 'var(--space-xs) var(--space-md)',
-                border: '1px solid var(--border)',
-                background: 'var(--white)',
+                padding: '8px 16px',
+                border: '2px solid #e74c3c',
+                borderRadius: 6,
+                background: '#fff',
+                color: '#e74c3c',
                 fontSize: '13px',
+                fontWeight: 600,
                 cursor: 'pointer',
+                transition: 'all 0.2s',
               }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#e74c3c'; e.currentTarget.style.color = '#fff'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#e74c3c'; }}
             >
               Disconnect
             </button>
