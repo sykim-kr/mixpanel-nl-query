@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TableData } from '../types';
+import type { TableData } from '../types';
 
 interface DataTableProps {
   table: TableData;

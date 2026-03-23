@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { QueryResponse, QueryErrorResponse } from '../types';
+import type { QueryResponse, QueryErrorResponse } from '../types';
 
 interface UseQueryReturn {
   isLoading: boolean;

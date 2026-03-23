@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { QueryMetadata } from '../types';
+import type { QueryMetadata } from '../types';
 
 interface MetadataPanelProps {
   metadata: QueryMetadata;

@@ -1,4 +1,4 @@
-import { HistoryEntry } from '../hooks/useHistory';
+import type { HistoryEntry } from '../hooks/useHistory';
 
 interface HistoryListProps {
   entries: HistoryEntry[];
