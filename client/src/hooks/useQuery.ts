@@ -22,7 +22,8 @@ export function useQuery(): UseQueryReturn {
     setResult(null);
 
     try {
-      const response = await fetch('/api/query', {
+      const apiBase = import.meta.env.VITE_API_URL || '';
+      const response = await fetch(`${apiBase}/api/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question, provider }),
