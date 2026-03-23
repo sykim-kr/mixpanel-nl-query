@@ -42,7 +42,7 @@ export function useMixpanelAuth() {
     setAuthError(null);
 
     try {
-      const apiBase = import.meta.env.VITE_API_URL || '';
+      const apiBase = import.meta.env?.VITE_API_URL || '';
       const response = await fetch(`${apiBase}/api/mixpanel/auth`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -84,7 +84,7 @@ export function useMixpanelAuth() {
   }, [persist, projects, sessionToken]);
 
   const logout = useCallback(async () => {
-    const apiBase = import.meta.env.VITE_API_URL || '';
+    const apiBase = import.meta.env?.VITE_API_URL || '';
     try {
       if (sessionToken) {
         await fetch(`${apiBase}/api/mixpanel/logout`, {
