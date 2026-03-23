@@ -105,17 +105,17 @@ export default function App() {
               onClick={logout}
               style={{
                 padding: '8px 16px',
-                border: '2px solid #e74c3c',
+                border: '2px solid #b8a9e8',
                 borderRadius: 6,
                 background: '#fff',
-                color: '#e74c3c',
+                color: '#6b5ca5',
                 fontSize: '13px',
                 fontWeight: 600,
                 cursor: 'pointer',
                 transition: 'all 0.2s',
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = '#e74c3c'; e.currentTarget.style.color = '#fff'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#e74c3c'; }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#6b5ca5'; e.currentTarget.style.color = '#fff'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.color = '#6b5ca5'; }}
             >
               Disconnect
             </button>
